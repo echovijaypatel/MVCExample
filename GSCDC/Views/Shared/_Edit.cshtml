@@ -1,0 +1,64 @@
+﻿@model GSCDC.Core.Models.EditSchemeCoreModel
+@using GSCDC.Web.Controllers
+
+@if (TempData[SchemesController.Temp_Error] != null)
+{
+    <div class="alert alert-danger alert-dismissable sticky-alert" id="alert-div">
+        <i class="fa fa-ban"></i>
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+        <b>@TempData[SchemesController.Temp_Error]</b>
+    </div>
+}
+@if (TempData[SchemesController.Temp_Success] != null)
+{
+    <div class="alert alert-success alert-dismissable sticky-alert" id="alert-div">
+        <i class="fa fa-check"></i>
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">X</button>
+        <b>@TempData[SchemesController.Temp_Success]</b>
+    </div>
+}
+
+@Html.AntiForgeryToken()
+
+
+<div class="form-group ">
+    <label class="control-label col-sm-4" style="text-align:right;">Scheme :</label>
+    <div class="col-sm-5">
+        @Html.DropDownListFor(a => a.SchemeID, @Model.LstScheme, "Select", new { @class = "form-control", @required = "Required" })
+    </div>
+    <div class="col-sm-3 text-danger">
+        @Html.ValidationMessageFor(x => x.SchemeID)
+    </div>
+</div>
+
+
+
+<div class="form-group">
+    <label class="control-label col-sm-4" style="text-align:right;"> Conformation No. : </label>
+    <div class="col-sm-5">
+        @Html.TextBoxFor(a => a.ConfNo, new { @class = "form-control", @required = "Required", @maxlength = "10", @onkeypress = "return isNumberKey(event)" })
+    </div>
+    <div class="col-sm-3 text-danger">
+        @Html.ValidationMessageFor(a => a.ConfNo)
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="control-label col-sm-4" style="text-align:right;">BirthDate :</label>
+    <div class="col-sm-5">
+        @Html.TextBoxFor(a => a.Birthdate, "{0:dd/M/yyyy}", new { @class = "form-control date" })
+    </div>
+    <div class="col-sm-3 text-danger">
+        @Html.ValidationMessageFor(x => x.Birthdate)
+    </div>
+</div>
+<hr>
+<div class="col-sm-12 text-center">
+    <!--<button type="reset" name="" class="btn btn-lg btn-blue hvr-underline-from-center">Create New Setup</button>&nbsp; &nbsp;-->
+    <button type="submit" name="" class="btn btn-lg btn-green hvr-underline-from-center">Submit</button>&nbsp; &nbsp;
+    <button type="reset" name="" class="btn btn-lg btn-red hvr-underline-from-center">Reset</button>&nbsp; &nbsp;
+
+</div>
+<script>
+
+</script>

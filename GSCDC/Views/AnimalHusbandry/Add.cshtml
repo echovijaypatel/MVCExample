@@ -1,0 +1,443 @@
+﻿@model GSCDC.SchemeAnimalHusbandry
+@using GSCDC.Web.Controllers
+
+@{
+    ViewBag.Title = "add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="txttitle text-center" style=" padding: 0 0 46px;">
+    ગુજરાત અનુસુચિત જાતિ વિકાસ કોર્પોરેશન
+    <span class="subtitle2">પશુપાલન યોજના</span>
+</h2>
+<span style="color:red;">બધી વિગતો અંગ્રેજી માં ભરવી.</span>
+
+
+@using (Html.BeginForm("Add", "AnimalHusbandry", FormMethod.Post, new { @class = "form-horizontal", @autocomplete = "off" }))
+{
+
+    if (TempData[AnimalHusbandryController.Temp_Error] != null)
+    {
+        <div class="alert alert-danger alert-dismissable sticky-alert" id="alert-div">
+            <i class="fa fa-ban"></i>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+            <b>@TempData[AnimalHusbandryController.Temp_Error]</b>
+        </div>
+    }
+    if (TempData[AnimalHusbandryController.Temp_Success] != null)
+    {
+        <div class="alert alert-success alert-dismissable sticky-alert" id="alert-div">
+            <i class="fa fa-check"></i>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">X</button>
+            <b>@TempData[AnimalHusbandryController.Temp_Success]</b>
+        </div>
+    }
+
+    @Html.HiddenFor(z => z.ID)
+    @Html.HiddenFor(z => z.WitnessSignature)
+    @Html.HiddenFor(z => z.ApplicantImage)
+    @Html.HiddenFor(z => z.ApplicantSignature)
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label class="control-label col-sm-4"> આધાર નંબર</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.AdhaarNo, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "12" })
+
+
+
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.AdhaarNo)
+        </div>
+    </div>
+    <h3 class="subtitle">અરજદારની વિગત</h3>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">પૂરેપૂરું નામ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.ApplicantName, new { @class = "form-control", @required = "Required", @onchange = "return  this.value = this.value.toUpperCase();", @maxlength = "100" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.ApplicantName)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4"> સરનામું</label>
+        <div class="col-sm-5">
+            @Html.TextAreaFor(a => a.Address, new { @class = "form-control", @required = "Required", @onchange = "return  this.value = this.value.toUpperCase();", @maxlength = "500" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.Address)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4"> પીન કોડ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.PINCODE, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "6" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.PINCODE)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">જીલ્લો</label>
+        <div class="col-sm-5">
+            @Html.DropDownListFor(a => a.DistrictID, @Model.LstDistrict, "Select", new { @class = "form-control", @required = "Required", @id = "District", @onchange = "GetTalukaList('District', 'Taluka')" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.DistrictID)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">તાલુકો</label>
+        <div class="col-sm-5">
+            @Html.DropDownListFor(a => a.TalukaID, @Model.LstTaluka, "Select", new { @class = "form-control", @id = "Taluka", @required = "Required" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.TalukaID)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">જન્મ તારીખ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.Birthdate, "{0:dd/M/yyyy}", new { @class = "form-control date", @onchange = "getAge();" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.Birthdate)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">ઉંમર</label>
+        <div class="col-sm-3">
+            @Html.TextBoxFor(a => a.Age, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+        <div class="col-sm-3 text-danger"><label class="control-label">(જાહેરાતની તારીખે)@Html.ValidationMessageFor(x => x.Age)</label></div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">કુટુંબના સભ્યોની સંખ્યા</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.NoofFamilyMember, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "2" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.NoofFamilyMember)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">તે પૈકી કમાતા સભ્યોની સંખ્યા</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.NoofFamilyMemberEarning, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "2" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.NoofFamilyMemberEarning)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">કુટુંબના સભ્યોની વાર્ષિક આવક રૂ.</label>
+
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">(અ) ઉદ્યોગ ધંધામાંથી રૂ.</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.IncomeFromBusiness, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IncomeFromBusiness)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(બ) જમીન ખેતીમાંથી રૂ.</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.IncomeFromFarming, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IncomeFromFarming)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(ક) નોકરીમાંથી રૂ.</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.IncomeFromSalary, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IncomeFromSalary)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(ડ) છુટક મજુરી/અન્ય વિ. રૂ.</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.IncomeFromOther, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IncomeFromOther)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">કુલ આવક રૂ.(કુટુંબના સભ્યોની વાર્ષિક આવક રૂ.)</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.FamilyIncome, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">અરજદારની જાતિ તથા પેટા જાતિ</label>
+        <div class="col-sm-2">
+            @Html.DropDownListFor(a => a.Category, new SelectList(Model.LstCategory, "Value", "Text"), new { @class = "form-control", @required = "Required" })
+        </div>
+        <div class="col-sm-4"><label class="control-label">(સક્ષમ અધિકારીશ્રીના દાખલાની નકલ સામેલ કરવી)</label></div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">શૈક્ષણિક લાયકાત</label>
+        <div class="col-sm-5">
+            @Html.DropDownListFor(a => a.SubCategory, new SelectList(Model.LstCategory, "Value", "Text"), new { @class = "form-control", @required = "Required" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">બી.પી.એલ.યાદી નં.</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BPLNo, new { @class = "form-control", @required = "Required", @maxlength = "30" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BPLNo)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">વિધવા</label>
+        <div class="col-sm-5 radio">
+            <label>@Html.RadioButtonFor(z => z.IsWidow, false)<span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+            <label>@Html.RadioButtonFor(z => z.IsWidow, false)<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IsWidow)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">વિકલાંગ જો હા તો માહિતી</label>
+        <div class="col-sm-5 radio">
+            <label>@Html.RadioButtonFor(z => z.IsPH, false, new { @onchange = "showhideTextbox('IsPH', 'PHRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+            <label>@Html.RadioButtonFor(z => z.IsPH, false, new { @onchange = "showhideTextbox('IsPH', 'PHRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>
+            @Html.TextBoxFor(a => a.PHRemark, new { @class = "form-control", @required = "Required", @maxlength = "100" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IsPH)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-6">અરજદાર કે તેઓના કુટુંબના અન્ય સભ્યએ અગાઉ ગુજરાત અનુસુચિત જાતિ વિકાસ કોર્પોરેશનની યોજનાઓ કે અન્ય સરકારી એજન્સી મારફત લોન / સહાય મેળવેલ છે કે કેમ ? તેની વિગતો આપવી.</label>
+        <div class="col-sm-3">
+            <div class="radio">
+                <label>@Html.RadioButtonFor(z => z.IsBeforeLoanTaken, true, new { @name = "IsBeforeLoanTaken", @onchange = "showhideTextbox('IsBeforeLoanTaken', 'BeforeLoanTakenRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+                <label>@Html.RadioButtonFor(z => z.IsBeforeLoanTaken, false, new { @name = "IsBeforeLoanTaken", @onchange = "showhideTextbox('IsBeforeLoanTaken', 'BeforeLoanTakenRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>
+            </div>
+            @Html.TextAreaFor(a => a.BeforeLoanTakenRemark, new { @class = "form-control", @maxlength = "200" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IsBeforeLoanTaken)
+            @Html.ValidationMessageFor(x => x.BeforeLoanTakenRemark)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">અ. Training </label>
+        <div class="col-sm-5">
+            <div class="radio">
+
+                @*<label><input type="radio" name="r1" value=""><span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+                    <label><input type="radio" name="r1" value=""><span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>*@
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">બ. Experience</label>
+        <div class="col-sm-5">
+            @*<input type="text" class="form-control">*@
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-5">ક. ધંધા લોનની જરૂરિયાત.</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(૧)સાધન સામગ્રી - સરંજામ માટે</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.LoanNeededForInstruments, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.LoanNeededForInstruments)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(૨)કાર્યકારી મૂડી માટે</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.LoanNeededForWork, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "8" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.LoanNeededForWork)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">ધંધાને અનુરૂપ જગ્યા ધરાવો છો  જો હા તો માહિતી ?</label>
+        <div class="col-sm-5 radio">
+            <label>@Html.RadioButtonFor(z => z.IsBusinessLand, true, new { @name = "IsBusinessLand", @onchange = "showhideTextbox('IsBusinessLand', 'BusinessLandRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+            <label>@Html.RadioButtonFor(z => z.IsBusinessLand, false, new { @name = "IsBusinessLand", @onchange = "showhideTextbox('IsBusinessLand', 'BusinessLandRemark')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>
+            @Html.TextAreaFor(a => a.BusinessLandRemark, new { @class = "form-control", @maxlength = "200" })
+
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IsBusinessLand)
+            @Html.ValidationMessageFor(x => x.BusinessLandRemark)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">લોન મળ્યા બાદ ધંધા આયોજન તથા માર્કેટિંગની વિગત</label>
+        <div class="col-sm-5">
+            @Html.TextAreaFor(a => a.BusinessPlanningRemark, new { @class = "form-control", @required = "Required", @maxlength = "500" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">સ્થાવર મિલકત ધરાવો છો જો હા તો કેટલી ?</label>
+        <div class="col-sm-5 radio">
+            <label>@Html.RadioButtonFor(z => z.IsSthavarProperty, true, new { @name = "IsSthavarProperty", @onchange = "showhideTextbox('IsSthavarProperty', 'SthavarPropertyPrice')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>હા</label>
+            <label>@Html.RadioButtonFor(z => z.IsSthavarProperty, false, new { @name = "IsSthavarProperty", @onchange = "showhideTextbox('IsSthavarProperty', 'SthavarPropertyPrice')" })<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ના</label>
+            @Html.TextBoxFor(a => a.SthavarPropertyPrice, new { @class = "form-control", @onkeypress = "return isNumberKey(event)", @maxlength = "9" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.IsSthavarProperty)
+            @Html.ValidationMessageFor(x => x.SthavarPropertyPrice)
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">ટેલીફોન નંબર (એસ.ટી.ડી.કોડ સાથે)</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.PhoneNo, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "15" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.PhoneNo)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">મોબાઇલ નંબર</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.Mobile, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "10" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.Mobile)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-4">બેન્ક ખાતાની વિગત</label>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(અ) બેન્ક નામ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BankName, new { @class = "form-control", @required = "Required", @maxlength = "50" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankName)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(બ) શાખાનું નામ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BankBranchName, new { @class = "form-control", @required = "Required", @maxlength = "50" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankBranchName)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(ક) ખાતાનો નંબર</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BankAccountNo, new { @class = "form-control", @required = "Required", @onkeypress = "return isNumberKey(event)", @maxlength = "20" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankAccountNo)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(ડ) ખાતાનો પ્રકાર બચત ખાતું/ચાલુ ખાતું</label>
+        <div class="col-sm-5 radio">
+            <label>@Html.RadioButtonFor(z => z.BankAccountType, "SAVING")<span class="cr"><i class="cr-icon fa fa-circle"></i></span>બચત ખાતું</label>
+            <label>@Html.RadioButtonFor(z => z.BankAccountType, "CURRENT")<span class="cr"><i class="cr-icon fa fa-circle"></i></span>ચાલુ ખાતું</label>
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankAccountType)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(ઈ) બેન્કનો માઈકર(MICR) કોડ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BankMicrCode, new { @class = "form-control", @required = "Required", @maxlength = "20" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankMicrCode)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">(એફ) બેન્કનો આઈ.એફ.એસ. કોડ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.BankIFSCCode, new { @class = "form-control", @required = "Required", @maxlength = "20" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.BankIFSCCode)
+        </div>
+    </div>
+
+    <hr>
+    <div class="form-group">
+        <label class="control-label col-sm-4">સાક્ષીનું નામ</label>
+        <div class="col-sm-5">
+            @Html.TextBoxFor(a => a.WitnessName, new { @class = "form-control", @required = "Required", @maxlength = "100", @onchange = "return  this.value = this.value.toUpperCase();" })
+        </div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.WitnessName)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">સાક્ષીનું સરનામું</label>
+        <div class="col-sm-5">@Html.TextBoxFor(a => a.WitnessAddress, new { @class = "form-control", @required = "Required", @maxlength = "255", @onchange = "return  this.value = this.value.toUpperCase();" })</div>
+        <div class="col-sm-3 text-danger">
+            @Html.ValidationMessageFor(x => x.WitnessAddress)
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-2 col-sm-offset-3"><img src="@Model.CaptchaImage" alt=""></div>
+        <div class="col-sm-3"> @Html.TextBoxFor(a => a.Captcha, new { @class = "form-control", @required = "Required", @autocomplete = "off", @placeholder = "Captcha" })</div>
+    </div>
+
+    <hr>
+
+    <div class="col-sm-12 text-center">
+        <!--<button type="reset" name="" class="btn btn-lg btn-blue hvr-underline-from-center">Create New Setup</button>&nbsp; &nbsp;-->
+        <button type="submit" name="" class="btn btn-lg btn-green hvr-underline-from-center">Submit</button>&nbsp; &nbsp;
+        <button type="reset" name="" class="btn btn-lg btn-red hvr-underline-from-center">Clear</button>&nbsp; &nbsp;
+        @*<button type="submit" name="" class="btn btn-lg btn-orange hvr-underline-from-center">Print</button>*@
+    </div>
+
+}
+<script>
+    $(document).ready(function () {
+        showhideTextbox('IsSthavarProperty', 'SthavarPropertyPrice');
+        showhideTextbox('IsBusinessLand', 'BusinessLandRemark');
+        showhideTextbox('IsBeforeLoanTaken', 'BeforeLoanTakenRemark');
+        showhideTextbox('IsPH', 'PHRemark');
+
+        $("#IncomeFromBusiness,#IncomeFromFarming,#IncomeFromSalary,#IncomeFromOther").on("change", function () {
+            debugger;
+            var IncomeFromBusiness = $("#IncomeFromBusiness").val() == "" ? 0 : parseFloat($("#IncomeFromBusiness").val());
+            var IncomeFromFarming = $("#IncomeFromFarming").val() == "" ? 0 : parseFloat($("#IncomeFromFarming").val());
+            var IncomeFromSalary = $("#IncomeFromSalary").val() == "" ? 0 : parseFloat($("#IncomeFromSalary").val());
+            var IncomeFromOther = $("#IncomeFromOther").val() == "" ? 0 : parseFloat($("#IncomeFromOther").val());
+
+            $("#FamilyIncome").val((IncomeFromBusiness + IncomeFromFarming + IncomeFromSalary + IncomeFromOther).toFixed(2));
+        });
+
+
+
+
+    });
+</script>
